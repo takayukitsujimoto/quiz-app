@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "text": "Which organ is primarily responsible for oxygen exchange?",
+    "image": null,
+    "choices": [
+      { "text": "Heart", "isCorrect": false },
+      { "text": "Lungs", "isCorrect": true },
+      { "text": "Liver", "isCorrect": false },
+      { "text": "Kidney", "isCorrect": false }
+    ],
+    "explanation": "The lungs are responsible for exchanging oxygen and carbon dioxide with the blood."
+  },
+  {
+    "id": 2,
+    "text": "Which blood vessel carries oxygenated blood from the lungs to the heart?",
+    "image": null,
+    "choices": [
+      { "text": "Pulmonary artery", "isCorrect": false },
+      { "text": "Pulmonary vein", "isCorrect": true },
+      { "text": "Aorta", "isCorrect": false },
+      { "text": "Vena cava", "isCorrect": false }
+    ],
+    "explanation": "The pulmonary vein carries oxygenated blood to the heart."
+  },
+  {
+    "id": 3,
+    "text": "43歳女性。右上葉に2cmの腫瘤影が認められ、切除術が施行された。術後の病理組織学的所見で最も考えられるものはどれか。",
+    "image": null,
+    "choices": [
+      { "text": "線毛性粘液結節性乳頭状腫瘍", "isCorrect": false },
+      { "text": "硬化性肺胞上皮腫", "isCorrect": true },
+      { "text": "肺過誤腫", "isCorrect": false },
+      { "text": "肺分画症", "isCorrect": false }
+    ],
+    "explanation": "・Ⅱ型肺胞上皮由来の良性腫瘍\n・中葉、下葉に多い\n・中年女性に好発\n・境界明瞭な単発性腫瘍\n・円形淡明細胞の充実性、乳頭状増殖している表面に立方状の上皮様細胞が覆う"
+  }
+]
