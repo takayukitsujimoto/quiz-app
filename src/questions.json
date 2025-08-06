@@ -1,6 +1,7 @@
 [
   {
     "id": 1,
+    "category": "呼吸器",
     "text": "Which organ is primarily responsible for oxygen exchange?",
     "image": null,
     "choices": [
@@ -13,6 +14,7 @@
   },
   {
     "id": 2,
+    "category": "循環器",
     "text": "Which blood vessel carries oxygenated blood from the lungs to the heart?",
     "image": null,
     "choices": [
@@ -25,8 +27,9 @@
   },
   {
     "id": 3,
+    "category": "呼吸器",
     "text": "43歳女性。右上葉に2cmの腫瘤影が認められ、切除術が施行された。術後の病理組織学的所見で最も考えられるものはどれか。",
-    "image": null,
+    "image": "/images/sclerosing_pneumocytoma.jpg",
     "choices": [
       { "text": "線毛性粘液結節性乳頭状腫瘍", "isCorrect": false },
       { "text": "硬化性肺胞上皮腫", "isCorrect": true },

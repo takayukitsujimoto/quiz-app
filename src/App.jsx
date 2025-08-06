@@ -11,22 +11,37 @@ function shuffleArray(array) {
   return copied;
 }
 
-function App() {
-  // 初回読み込み時に10問をランダムに選択
-  const shuffledQuestions = shuffleArray(allQuestions).slice(0, 10);
-  const [questions] = useState(shuffledQuestions);
+// 利用できるカテゴリ一覧（増やすだけでOK）
+const categories = ["呼吸器", "循環器", "消化器"];
 
+function App() {
+  const [view, setView] = useState("home"); // "home", "quiz", "result"
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [questions, setQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selected, setSelected] = useState(null);
   const [showExplanation, setShowExplanation] = useState(false);
   const [score, setScore] = useState(0);
-  const [finished, setFinished] = useState(false);
 
   const currentQuestion = questions[currentIndex];
 
+  const startQuiz = (category) => {
+   const filtered = category
+     ? allQuestions.filter(q => q.category === category)
+     : allQuestions;
+   const shuffled = shuffleArray(filtered).slice(0, 10);
+   setSelectedCategory(category);
+   setQuestions(shuffled);
+   setCurrentIndex(0);
+   setScore(0);
+   setSelected(null);
+   setShowExplanation(false);
+   setView("quiz");
+ };
+
+
   const handleAnswer = () => {
     if (selected === null) return;
-
     if (currentQuestion.choices[selected].isCorrect) {
       setScore(score + 1);
     }
@@ -39,25 +54,72 @@ function App() {
     if (currentIndex + 1 < questions.length) {
       setCurrentIndex(currentIndex + 1);
     } else {
-      setFinished(true);
+      setView("result");
     }
   };
 
-  if (finished) {
+  const goHome = () => {
+    setView("home");
+    setSelectedCategory(null);
+  };
+
+  // ---------------------------
+  // ホーム画面
+  if (view === "home") {
+  return (
+    <div style={{ padding: "2rem" }}>
+      <h1>臓器別クイズアプリ</h1>
+      <p>出題カテゴリを選んでください：</p>
+      <button
+        onClick={() => startQuiz(null)}
+        style={{
+          margin: "0.5rem",
+          padding: "1rem",
+          fontSize: "1rem",
+          backgroundColor: "#f0c040"
+        }}
+      >
+        🔀 全カテゴリからランダム出題
+      </button>
+      {categories.map((cat) => (
+        <button
+          key={cat}
+          onClick={() => startQuiz(cat)}
+          style={{
+            margin: "0.5rem",
+            padding: "1rem",
+            fontSize: "1rem"
+          }}
+        >
+          {cat}
+        </button>
+      ))}
+   　 </div>
+ 　 );
+}
+
+  // ---------------------------
+  // 結果画面
+  if (view === "result") {
     return (
       <div style={{ padding: "2rem" }}>
-        <h1>演習終了！</h1>
+        <h1>{selectedCategory}クイズ 終了！</h1>
         <p>正解数: {score} / {questions.length}</p>
         <p>正答率: {(score / questions.length * 100).toFixed(1)}%</p>
+        <button onClick={goHome}>ホームにもどる</button>
       </div>
     );
   }
 
+  // ---------------------------
+  // クイズ画面
   return (
     <div style={{ padding: "2rem" }}>
-      <h2>問題 {currentIndex + 1}</h2>
+      <h2>{selectedCategory}：問題 {currentIndex + 1}</h2>
       <p>{currentQuestion.text}</p>
-      {currentQuestion.image && <img src={currentQuestion.image} alt="問題画像" width="300" />}
+      {currentQuestion.image && (
+        <img src={currentQuestion.image} alt="問題画像" width="300" />
+      )}
       <div>
         {currentQuestion.choices.map((choice, idx) => (
           <button
@@ -84,7 +146,7 @@ function App() {
           </p>
           <div>
             <strong>解説:</strong>
-            {currentQuestion.explanation.split('\n').map((line, idx) => (
+            {currentQuestion.explanation.split("\n").map((line, idx) => (
               <p key={idx}>{line}</p>
             ))}
           </div>
