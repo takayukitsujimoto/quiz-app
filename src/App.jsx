@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import allQuestions from "./questions.json";
 import Login from "./Login";
+import { auth, db } from "./firebase";
+import { collection, addDoc, Timestamp } from "firebase/firestore";
 
-// カテゴリ一覧を取得（例: 呼吸器, 循環器...）
+// カテゴリ一覧を取得
 const getCategories = (questions) => {
   const set = new Set(questions.map((q) => q.category));
   return [...set];
@@ -18,14 +20,32 @@ function shuffleArray(array) {
 }
 
 function App() {
-  const [user, setUser] = useState(null); // 🔑 ログイン状態管理
-  const [view, setView] = useState("home"); // home or quiz
+  const [user, setUser] = useState(null);
+  const [view, setView] = useState("home");
   const [currentQuestions, setCurrentQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selected, setSelected] = useState(null);
   const [showExplanation, setShowExplanation] = useState(false);
   const [score, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
+
+  // 🔥 成績を保存する関数
+  const saveResult = async () => {
+    if (!user) return;
+    try {
+      await addDoc(collection(db, "results"), {
+        uid: user.uid,
+        email: user.email,
+        score: score,
+        total: currentQuestions.length,
+        correctRate: (score / currentQuestions.length) * 100,
+        createdAt: Timestamp.now()
+      });
+      console.log("✅ 成績を保存しました");
+    } catch (err) {
+      console.error("❌ 成績の保存に失敗しました", err);
+    }
+  };
 
   const startQuiz = (category) => {
     const filtered = category === "all"
@@ -43,7 +63,6 @@ function App() {
 
   const handleAnswer = () => {
     if (selected === null) return;
-
     if (currentQuestions[currentIndex].choices[selected].isCorrect) {
       setScore(score + 1);
     }
@@ -57,6 +76,7 @@ function App() {
       setCurrentIndex(currentIndex + 1);
     } else {
       setFinished(true);
+      saveResult(); // 🔥 成績保存
     }
   };
 
@@ -118,9 +138,7 @@ function App() {
 
   return (
     <div style={{ padding: "2rem" }}>
-      {/* 🔐 ログインUI */}
       <Login onUserChange={setUser} />
-      
       <h1>臓器別クイズアプリ</h1>
       <p>出題カテゴリを選んでください。</p>
 
