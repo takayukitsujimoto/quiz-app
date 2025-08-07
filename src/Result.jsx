@@ -1,10 +1,10 @@
-// src/Results.jsx
 import React, { useEffect, useState } from "react";
 import { db } from "./firebase";
 import { collection, query, where, orderBy, getDocs } from "firebase/firestore";
 
 const Results = ({ user, goHome }) => {
   const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchResults = async () => {
@@ -15,12 +15,21 @@ const Results = ({ user, goHome }) => {
         orderBy("createdAt", "desc")
       );
       const snapshot = await getDocs(q);
-      const fetched = snapshot.docs.map((doc) => doc.data());
+      const fetched = snapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          ...data,
+          createdAt: data.createdAt?.toDate?.() || new Date(), // 安全に変換
+        };
+      });
       setResults(fetched);
+      setLoading(false);
     };
 
     fetchResults();
   }, [user]);
+
+  if (loading) return <p>読み込み中...</p>;
 
   return (
     <div style={{ padding: "2rem" }}>
@@ -40,7 +49,7 @@ const Results = ({ user, goHome }) => {
           <tbody>
             {results.map((r, i) => (
               <tr key={i}>
-                <td>{r.createdAt.toDate().toLocaleString()}</td>
+                <td>{r.createdAt.toLocaleString()}</td>
                 <td>{r.score} / {r.total}</td>
                 <td>{r.correctRate.toFixed(1)}%</td>
               </tr>
