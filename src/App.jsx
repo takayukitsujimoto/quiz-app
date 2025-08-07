@@ -3,8 +3,8 @@ import allQuestions from "./questions.json";
 import Login from "./Login";
 import { auth, db } from "./firebase";
 import { collection, addDoc, Timestamp } from "firebase/firestore";
+import Results from "./Results"; // 追加
 
-// カテゴリ一覧を取得
 const getCategories = (questions) => {
   const set = new Set(questions.map((q) => q.category));
   return [...set];
@@ -29,7 +29,6 @@ function App() {
   const [score, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
 
-  // 🔥 成績を保存する関数
   const saveResult = async () => {
     if (!user) return;
     try {
@@ -39,7 +38,7 @@ function App() {
         score: score,
         total: currentQuestions.length,
         correctRate: (score / currentQuestions.length) * 100,
-        createdAt: Timestamp.now()
+        createdAt: Timestamp.now(),
       });
       console.log("✅ 成績を保存しました");
     } catch (err) {
@@ -48,9 +47,10 @@ function App() {
   };
 
   const startQuiz = (category) => {
-    const filtered = category === "all"
-      ? allQuestions
-      : allQuestions.filter((q) => q.category === category);
+    const filtered =
+      category === "all"
+        ? allQuestions
+        : allQuestions.filter((q) => q.category === category);
     const shuffled = shuffleArray(filtered).slice(0, 10);
     setCurrentQuestions(shuffled);
     setCurrentIndex(0);
@@ -76,13 +76,17 @@ function App() {
       setCurrentIndex(currentIndex + 1);
     } else {
       setFinished(true);
-      saveResult(); // 🔥 成績保存
+      saveResult();
     }
   };
 
   const goHome = () => {
     setView("home");
   };
+
+  if (view === "results") {
+    return <Results user={user} goHome={goHome} />;
+  }
 
   if (view === "quiz") {
     const q = currentQuestions[currentIndex];
@@ -100,7 +104,7 @@ function App() {
               style={{
                 background: selected === idx ? "#add8e6" : "#eee",
                 margin: "0.5rem",
-                padding: "0.5rem 1rem"
+                padding: "0.5rem 1rem",
               }}
             >
               {choice.text}
@@ -128,8 +132,12 @@ function App() {
         {finished && (
           <div>
             <h2>演習終了！</h2>
-            <p>正解数: {score} / {currentQuestions.length}</p>
-            <p>正答率: {(score / currentQuestions.length * 100).toFixed(1)}%</p>
+            <p>
+              正解数: {score} / {currentQuestions.length}
+            </p>
+            <p>
+              正答率: {(score / currentQuestions.length * 100).toFixed(1)}%
+            </p>
           </div>
         )}
       </div>
@@ -141,14 +149,20 @@ function App() {
       <Login onUserChange={setUser} />
       <h1>臓器別クイズアプリ</h1>
       <p>出題カテゴリを選んでください。</p>
-
       <button onClick={() => startQuiz("all")}>全カテゴリから10問出題</button>
-      
-      {getCategories(allQuestions).map((category) => (
-        <div key={category} style={{ marginTop: "1rem" }}>
-          <button onClick={() => startQuiz(category)}>{category}の問題を解く</button>
-        </div>
-      ))}
+      <div style={{ marginTop: "1rem" }}>
+        {getCategories(allQuestions).map((category) => (
+          <div key={category} style={{ marginTop: "0.5rem" }}>
+            <button onClick={() => startQuiz(category)}>
+              {category}の問題を解く
+            </button>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ marginTop: "2rem" }}>
+        <button onClick={() => setView("results")}>📊 成績一覧を見る</button>
+      </div>
     </div>
   );
 }
